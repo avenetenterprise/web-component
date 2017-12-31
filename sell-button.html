@@ -1,0 +1,72 @@
+<html>
+  <template id="sellBtn">
+
+    <style>
+      :host {
+        --orange: #e67e22;
+        --space: 1.5em;
+      }
+      .btn-container {
+        border: 2px dashed var(--orange);
+        padding: var(--space);
+        text-align: center;
+      }
+      .btn {
+        background-color: var(--orange);
+        border: 0;
+        border-radius: 5px;
+        color: white;
+        padding: var(--space);
+        text-transform: uppercase;
+      }
+    </style>
+
+    <div class="btn-container">
+        <button class="btn"><slot name = "text"></slot></button>
+    </div>
+  </template>
+
+  <script>
+    class SellButton extends HTMLElement {
+      constructor () {
+        super();
+        this._text = null;
+        this.importDocument = document.currentScript.ownerDocument;
+      }
+
+      static get observedAttributes () {
+        return ['text'];
+      }
+
+      attributeChangedCallback (name, oldValue, newValue) {
+        if (this.shadowRoot) {
+          this.shadowRoot.querySelector(`[name="${name}"]`).innerHTML = this[name];
+        }
+      }
+
+      connectedCallback () {
+        let shadowRoot = this.attachShadow({mode: 'open'});
+        const t = this.importDocument.querySelector('#sellBtn');
+        const instance = t.content.cloneNode(true);
+
+        instance.querySelector('[name="text"]').innerHTML = this.text;
+
+        shadowRoot.appendChild(instance);
+        this.addEventListener('click', ()=>{
+            alert('Hola ' + this.getAttribute('text') + '!');
+        });
+      }
+
+      get text () {
+        console.log('get text()')
+        return this.getAttribute('text');
+      }
+      set text (val) {
+        console.log(`set text(${val})`);
+        this._text = val;
+      }
+    }
+
+    window.customElements.define('sell-button', SellButton);
+  </script>
+</html>
